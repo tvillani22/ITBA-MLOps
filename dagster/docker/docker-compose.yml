@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres
+    ports:
+      - $PGPORT:$PGPORT
+    networks:
+      - airbyte_network
+      - compose_network
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    env_file:
+      - ../.env
+    hostname: $PGHOST_KIND_NW
+    container_name: mlops-postgres
+    healthcheck:
+      test: pg_isready
+      interval: 3s
+      timeout: 5s
+      retries: 3
+    restart: always
+    volumes:
+      - $POSTGRES_DATA_FOLDER:/var/lib/postgresql/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mlflow:
+    image: mlflow-tracking-server
+    pull_policy: never
+    build: 
+      context: ./mlflow
+    restart: always
+    container_name: mlflow_server
+    depends_on:
+     postgres:
+       condition: service_healthy
+    ports:
+      - $MLFLOW_TRACKING_PORT:$MLFLOW_TRACKING_PORT
+    networks:
+      - compose_network
+    env_file:
+      - ../.env
+    environment:
+      AWS_SHARED_CREDENTIALS_FILE: run/secrets/aws_credentials
+    secrets:
+      - aws_credentials
+    command: >
+      mlflow server 
+       --backend-store-uri $ML_FLOW_POSTGRES_CONN_STRING
+       --default-artifact-root $MLFLOW_ARTIFACTS_PATH
+       --host 0.0.0.0
+       --port $MLFLOW_TRACKING_PORT
+
+networks:
+  compose_network:
+    driver: bridge
+  airbyte_network:
+    name: $AIRBYTE_NETWORK_NAME
+    external: true
+
+secrets:
+  aws_credentials:
+    file: ../secrets/aws_credentials.txt

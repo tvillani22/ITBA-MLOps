@@ -1,0 +1,6 @@
+airbyte-dbt-env/
+dbs/data/
+mlflow_data/
+.dummy/
+secrets/
+*.log

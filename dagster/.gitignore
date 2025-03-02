@@ -1,0 +1,10 @@
+dagster_home/
+dbs/data/
+dbt_mlops_project/.*
+mlruns/
+mlartifacts/
+logs/
+secrets/
+.dummy/
+**.code**
+**/__pycache__/**

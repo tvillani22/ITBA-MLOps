@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: recommmender_system_raw
+    description: "machine learning raw tables"
+    database: mlops
+    schema: "{{ env_var('WAREHOUSE_SOURCE_SCHEMA') }}"
+    tables:
+      - name: scores
+      - name: movies
+      - name: users
+
+models:
+  - name: users
+    columns:
+      - name: user_id
+        tests:
+          - not_null

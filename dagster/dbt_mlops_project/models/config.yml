@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: recommmender_system_raw
+    description: "machine learning raw tables"
+    database: mlops
+    schema: "{{ env_var('WAREHOUSE_SOURCE_SCHEMA') }}"
+    tables:
+      - name: movies
+        meta:
+         dagster:
+           asset_key: ["movies_raw"]
+      - name: users
+        meta:
+          dagster:
+            asset_key: ["users_raw"]
+      - name: scores
+        meta:
+          dagster:
+            asset_key: ["scores_raw"]
+
+models:
+  - name: users
+    columns:
+      - name: user_id
+        tests:
+          - not_null
